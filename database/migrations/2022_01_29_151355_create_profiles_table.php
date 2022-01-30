@@ -18,6 +18,7 @@ class CreateProfilesTable extends Migration
             $table->string('image')->nullable();
             $table->string('description')->nullable();
             $table->string('country')->nullable();
+            $table->integer('phone')->nullable();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

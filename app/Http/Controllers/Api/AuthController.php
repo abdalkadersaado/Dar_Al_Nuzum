@@ -59,7 +59,7 @@ class AuthController extends Controller
         $user= auth()->user();
 
         $user_info = $user->load(['profile'=>function ($q){
-            $q->select('description','country','image','user_id');
+            $q->select('description','country','image','phone','user_id');
         } ]);
 
         return response()->json([
