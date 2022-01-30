@@ -43,3 +43,15 @@ Route::group(['middleware' => 'api','prefix' => 'users' , 'namespace'=> 'Api'], 
 
 });
 ########################################################################
+
+############################ Manage Service####################################
+Route::group(['namespace'=>'Api','middleware' => 'api','prefix'=>'services'],function($router){
+
+    Route::get('index','ServiceController@index');
+    Route::post('store','ServiceController@store');
+    Route::get('show/{id}','ServiceController@show');
+    Route::post('/update/{service}','ServiceController@update');
+    Route::delete('/{service}','ServiceController@destroy');
+});
+########################################################################
+
