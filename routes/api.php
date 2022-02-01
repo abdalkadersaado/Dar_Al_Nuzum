@@ -55,3 +55,14 @@ Route::group(['namespace'=>'Api','middleware' => 'api','prefix'=>'services'],fun
 });
 ########################################################################
 
+############################ Manage Testimonial####################################
+
+Route::group(['prefix'=>'testimonial','namespace'=>'Api','middleware'=>'api'],function(){
+
+    Route::apiResource('testimonials','TestimonialController');
+    // Route::post('store','TestimonialController@store');
+ });
+
+
+########################################################################
+

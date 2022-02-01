@@ -45,11 +45,20 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $with=['profile'];
+
     ############# Relationship #####################
 
     public function profile(){
 
         return $this->hasOne(Profile::class)->withDefault();
+    }
+
+
+    public function testimonial(){
+
+        return $this->hasMany(Testimonial::class);
     }
 
     ################################################

@@ -14,6 +14,11 @@ class ServiceController extends Controller
 {
     use imageTrait;
 
+    public function __construct(){
+
+        $this->middleware('JWT');
+    }
+
     public function index()
     {
 
@@ -23,7 +28,7 @@ class ServiceController extends Controller
     {
 
         $request->validate([
-            'name' => ['required'],
+            'name' => ['required','unique:services,name'],
             'description' => ['required'],
 
         ]);
@@ -46,7 +51,7 @@ class ServiceController extends Controller
         }
         return response()->json([
             'message' => 'Service was added Successfully.',
-            'status' => 201
+            'status' => 200
         ]);
     }
 
@@ -54,8 +59,8 @@ class ServiceController extends Controller
     {
 
         $request->validate([
-            'name' => ['required'],
-            'description' => ['required'],
+            'name' => 'required','unique:services,name'.$service->id,
+            'description' => 'required',
 
         ]);
 
