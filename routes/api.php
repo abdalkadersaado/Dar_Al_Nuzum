@@ -63,6 +63,19 @@ Route::group(['prefix'=>'testimonial','namespace'=>'Api','middleware'=>'api'],fu
     // Route::post('store','TestimonialController@store');
  });
 
+########################################################################
+
+################################ Manage Gallary #########################
+
+Route::group(['namespace'=>'Api','middleware'=>'api','prefix'=>'gallary'],function(){
+
+    Route::post('store','GallaryController@store');
+    Route::get('index','GallaryController@index');
+    Route::get('show/photo/{gallary}','GallaryController@show');
+    Route::post('update/{gallary}','GallaryController@update');
+    Route::put('status/{gallary}','GallaryController@change_status');
+    Route::delete('/{gallary}','GallaryController@destroy');
+});
 
 ########################################################################
 
