@@ -69,6 +69,13 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
+        $image = $user->profile->image;
+
+        if($image){
+
+            unlink($image);
+
+        }
         if ($user) {
 
             $user->delete();

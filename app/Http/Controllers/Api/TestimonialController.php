@@ -50,6 +50,8 @@ class TestimonialController extends Controller
 
     public function update(Request $request, Testimonial $testimonial){
 
+        $this->authorize('update',$testimonial);
+
         $request->validate([
             'description'=>['required']
         ]);
@@ -69,7 +71,10 @@ class TestimonialController extends Controller
 
     }
 
-    public function destroy(Testimonial $testimonial){
+    public function destroy(Testimonial $testimonial)
+    {
+
+        $this->authorize('delete',$testimonial);
 
         $testimonial->delete();
 

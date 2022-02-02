@@ -86,7 +86,7 @@ class ProfileController extends Controller
         $extension = $file->getClientOriginalExtension();
         $temp_name  = uniqid(10) . time();
         $image = interImage::make($file);
-        $path = 'uploads/image_profile_' . $temp_name . '.' . $extension;
+        $path = 'uploads/profile/image_profile_' . $temp_name . '.' . $extension;
         $image->save($path);
 
         return $path;

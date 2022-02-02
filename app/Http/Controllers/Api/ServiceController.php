@@ -14,44 +14,71 @@ class ServiceController extends Controller
 {
     use imageTrait;
 
-    public function __construct(){
+    public function __construct()
+    {
 
         $this->middleware('JWT');
     }
 
-    public function index()
+    public static function index()
     {
+        // $this->authorize('viewAny', Service::class);
 
-        return Service::all();
+        $user = auth()->user();
+
+        if ($user->role_id == 1) {
+
+            $services = Service::all();
+            if (count($services) > 0) {
+                return $services;
+            } else {
+                return response()->json([
+                    'message' => 'no found any saved service .'
+                ]);
+            }
+        }
+        return response()->json([
+            'message' => 'This action is unauthorized.',
+            'status' => 403
+        ]);
     }
     public function store(Request $request)
     {
 
         $request->validate([
-            'name' => ['required','unique:services,name'],
+            'name' => ['required', 'unique:services,name'],
             'description' => ['required'],
 
         ]);
 
-        if ($request->image) {
+        $user = auth()->user();
 
-            $path = $this->store_image_file($request->image);
+        if ($user->role_id == 1) {
 
-            $service = new Service();
-            $service->name = $request->name;
-            $service->description = $request->description;
-            $service->image = $path;
-            $service->save();
-        } else {
-            $service = new Service();
-            $service->name = $request->name;
-            $service->description = $request->description;
+            if ($request->image) {
 
-            $service->save();
+                $path = $this->store_image_file($request->image);
+
+                $service = new Service();
+                $service->name = $request->name;
+                $service->description = $request->description;
+                $service->image = $path;
+                $service->save();
+            } else {
+                $service = new Service();
+                $service->name = $request->name;
+                $service->description = $request->description;
+
+                $service->save();
+            }
+            return response()->json([
+                'message' => 'Service was added Successfully.',
+                'status' => 200
+            ]);
         }
         return response()->json([
-            'message' => 'Service was added Successfully.',
-            'status' => 200
+            'message' => 'This action is unauthorized.',
+            'status' => 403
         ]);
     }
 
@@ -59,47 +86,78 @@ class ServiceController extends Controller
     {
 
         $request->validate([
-            'name' => 'required','unique:services,name'.$service->id,
+            'name' => 'required', 'unique:services,name' . $service->id,
             'description' => 'required',
 
         ]);
 
-        if ($request->image) {
-            $path = $this->store_image_file($request->image);
+        $user = auth()->user();
 
-            $service->update([
-                'name' => $request->name,
-                'description' => $request->name,
-                'image' => $path
-            ]);
-        } else {
-            $service->update([
-                'name' => $request->name,
-                'description' => $request->description,
+        if ($user->role_id == 1) {
+
+            if ($request->image) {
+                $path = $this->store_image_file($request->image);
+
+                $service->update([
+                    'name' => $request->name,
+                    'description' => $request->name,
+                    'image' => $path
+                ]);
+            } else {
+                $service->update([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                ]);
+            }
+            return response()->json([
+                'message' => 'Service was Updated Successfully.',
+                'status' => 200
             ]);
         }
         return response()->json([
-            'message' => 'Service was Updated Successfully.',
-            'status' => 200
+            'message' => 'This action is unauthorized.',
+            'status' => 403
         ]);
     }
 
     public function show($id)
     {
+        $user = auth()->user();
 
-        $service = Service::findOrFail($id);
+        if ($user->role_id == 1) {
 
-        return response()->json($service, 200);
+            $service = Service::findOrFail($id);
+
+            return response()->json($service, 200);
+        }
+        return response()->json([
+            'message' => 'This action is unauthorized.',
+            'status' => 403
+        ]);
     }
 
     public function destroy(Service $service)
     {
+        $user = auth()->user();
 
-        $service->delete();
+        if ($user->role_id == 1) {
 
+            $image = $service->image;
+
+            if ($image) {
+                unlink($image);
+            }
+
+            $service->delete();
+
+            return response()->json([
+                'status' => '200',
+                'message' => 'service was Deleted successfully.'
+            ]);
+        }
         return response()->json([
-            'status' => '200',
-            'message' => 'service was Deleted successfully.'
+            'message' => 'This action is unauthorized.',
+            'status' => 403
         ]);
     }
 }

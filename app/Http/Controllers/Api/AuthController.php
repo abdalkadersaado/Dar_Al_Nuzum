@@ -120,7 +120,7 @@ class AuthController extends Controller
             'user_id' => auth()->user()->id,
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 100,
+            'expires_in' => auth()->factory()->getTTL() * 200,
             'name' => auth()->user()->name,
             'email' => auth()->user()->email,
             'role_id' => auth()->user()->role_id,
