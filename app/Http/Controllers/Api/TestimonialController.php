@@ -6,80 +6,77 @@ use App\Models\User;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\responseApiTrait;
 
 class TestimonialController extends Controller
 {
+    use responseApiTrait;
 
-    public function __construct(){
-         $this->middleware('JWT');
+    public function __construct()
+    {
+        $this->middleware(['auth']);
     }
 
-    public function index(){
+    public function index()
+    {
 
+        $data['testimonial'] = Testimonial::with('user:id,name,email')->latest()->paginate(5);
 
-       $data['testimonial'] = Testimonial::with('user:id,name,email')->latest()->paginate(5);
-
-
-       return response()->json($data);
-
-
+        return $this->responseData('testimonial', $data, 'Testemonials Selected Successfully.');
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $request->validate([
-            'description'=>['required']
+            'description' => ['required']
         ]);
 
 
         $testimonial = $request->user()->testimonial()->create(
 
-           ['description'=> $request->description]
+            ['description' => $request->description]
         );
 
-        return response()->json([
-            'message' => 'Testimonial was added successfully.',
-            'status'=> 201
-        ]);
-
-        // return response()->json([
-        //     'testimonial'=>$testimonial,
-        //     'user' => $request->user()->profile
-        // ]);
+        return $this->responseSuccess('Testimonial Added Successfully.');
     }
 
-    public function update(Request $request, Testimonial $testimonial){
+    public function update(Request $request, $testimonial)
+    {
 
-        $this->authorize('update',$testimonial);
+        $testimonial = Testimonial::find($testimonial);
+
+        if (!$testimonial) {
+            return $this->responseError('Not Found page', 404);
+        }
+
+        $this->authorize('update', $testimonial);
 
         $request->validate([
-            'description'=>['required']
+            'description' => ['required']
         ]);
 
         $testimonial->update([
-            'description'=>$request->description
+            'description' => $request->description
         ]);
-
-        return response()->json([
-            'message'=>'testimonial was updated successfully.',
-            'status' => 200
-        ]);
-
+        return $this->responseSuccess('testimonial was updated successfully.');
     }
 
-    public function show($id){
-
-    }
-
-    public function destroy(Testimonial $testimonial)
+    public function show($id)
     {
+    }
 
-        $this->authorize('delete',$testimonial);
+    public function destroy($testimonial)
+    {
+        $testimonial = Testimonial::find($testimonial);
+
+        if (!$testimonial) {
+            return $this->responseError('Not Found page', 404);
+        }
+
+        $this->authorize('delete', $testimonial);
 
         $testimonial->delete();
-
-        return response()->json([
-            'message'=>'testimonial deleted successfully.'
-        ]);
+        return $this->responseSuccess('testimonial deleted successfully.');
     }
 }

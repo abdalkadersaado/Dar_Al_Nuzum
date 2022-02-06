@@ -6,56 +6,50 @@ use App\Models\Blog;
 use Illuminate\Http\Request;
 use App\Http\Traits\imageTrait;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\responseApiTrait;
 
 class BlogController extends Controller
 {
-    use imageTrait;
+    use imageTrait, responseApiTrait;
 
     public function __construct()
     {
-        $this->middleware('JWT')->except('index','show');
+        $this->middleware(['JWT', 'Admin'])->except('index', 'show');
     }
 
     public function index()
     {
 
-        return Blog::latest()->paginate(10);
+        $blogs = Blog::latest()->paginate(10);
+
+        return $this->responseData('blogs', $blogs, 'Blogs Selected Successfully');
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => ['required'],
+            'description' => ['required'],
+            'image' => ['required']
+        ]);
 
-        $user = auth()->user();
-        if ($user->role_id == 1) {
-            $request->validate([
-                'title' => ['required'],
-                'description' => ['required'],
-                'image' => ['required']
-            ]);
-
-            $path =  $this->store_image_file2($request->image, 'attachments/blog');
-            $request->user()->blogs()->create([
-                'title' => $request->title,
-                'description' => $request->description,
-                'image' => $path,
-            ]);
-
-            return response()->json([
-                'message' => 'Added successfully',
-                'status' => 200
-            ]);
-        }else{
-            return response()->json([
-                'message' => 'Action not Authorization.',
-                'status' => 403
-            ]);
-        }
+        $path =  $this->store_image_file2($request->image, 'attachments/blog');
+        $request->user()->blogs()->create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'image' => $path,
+        ]);
+        return $this->responseSuccess('Added successfully');
     }
 
-    public function update(Request $request, Blog $blog)
+    public function update(Request $request, $id)
     {
-        $user = auth()->user();
-        if ($user->role_id == 1) {
+        $blog = Blog::find($id);
+
+        if (!$blog) {
+            return $this->responseError('Not Found Page', 404);
+        }
+
         $request->validate([
             'title' => ['required'],
             'description' => ['required'],
@@ -67,7 +61,6 @@ class BlogController extends Controller
             unlink($img);
         }
 
-
         $path =  $this->store_image_file2($request->image, 'attachments/blog');
 
         $blog->update([
@@ -75,30 +68,30 @@ class BlogController extends Controller
             'description' => $request->description,
             'image' => $path,
         ]);
-
-        return response()->json([
-            'message' => 'Updated successfully',
-            'status' => 200
-        ]);
-    }else{
-        return response()->json([
-            'message' => 'Action not Authorization.',
-            'status' => 403
-        ]);
+        return $this->responseSuccess('Updated successfully');
     }
 
-    }
 
-    public function show(Blog $blog)
+    public function show($id)
     {
+        $blog = Blog::find($id);
 
-        return response()->json($blog);
+        if (!$blog) {
+            return $this->responseError('Not Found Page', 404);
+        }
+
+        return $this->responseData('blog', $blog, 'blog selected successfully.');
     }
 
-    public function destroy(Blog $blog)
+    public function destroy($id)
     {
-        $user = auth()->user();
-        if ($user->role_id == 1) {
+        $blog = Blog::find($id);
+
+        if (!$blog) {
+            return $this->responseError('Not Found Page', 404);
+        }
+
+
         //delete image from directory
         $img = $blog->image;
         if ($img) {
@@ -106,16 +99,6 @@ class BlogController extends Controller
         }
 
         $blog->delete();
-
-        return response()->json([
-            'message' => 'blog was Deleted successfully.',
-            'status' => 200
-        ]);
-    }else{
-            return response()->json([
-                'message' => 'Action not Authorization.',
-                'status' => 403
-            ]);
-        }
+        return $this->responseSuccess('blog was Deleted successfully.');
     }
 }

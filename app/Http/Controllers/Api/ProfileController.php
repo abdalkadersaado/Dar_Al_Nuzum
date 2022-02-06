@@ -5,17 +5,25 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Intervention\Image\Image;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\imageTrait;
+use App\Http\Traits\responseApiTrait;
 use Intervention\Image\Facades\Image as interImage;
 
 class ProfileController extends Controller
 {
+    use imageTrait, responseApiTrait;
+
+    public function __construct()
+    {
+        $this->middleware(['auth', 'Admin']);
+    }
+
     public function update(Request $request)
     {
-
         $request->validate([
             'description' => 'sometimes|required',
             'country' => 'sometimes|required',
-            'phone' =>['sometimes','integer'],
+            'phone' => ['sometimes', 'integer'],
             'image' => 'sometimes|required'
         ]);
 
@@ -23,72 +31,20 @@ class ProfileController extends Controller
 
         if ($request->image) {
 
-            $path = $this->store_image_file($request->image);
-            // $result = $request->file('image')->store('apiDocs');
+            $path = $this->store_image_file2($request->image, 'attachments/profile');
 
-            $profile_info = $user->profile()->updateOrCreate([
-
-                'user_id' => $user->id,
-            ], [
-
+            $profile_info = $user->profile()->update([
                 'image' => $path
             ]);
-        } elseif ($request->description) {
+        } else {
+            $profile_info = $user->profile()->update([
 
-            $profile_info = $user->profile()->updateOrCreate([
-
-                'user_id' => $user->id,
-            ], [
-                'description' => $request->description,
-
-            ]);
-        } elseif ($request->country) {
-
-            $profile_info = $user->profile()->updateOrCreate([
-
-                'user_id' => $user->id,
-            ], [
-                'country' => $request->country,
-
-            ]);
-        }
-        elseif ($request->phone) {
-
-            $profile_info = $user->profile()->updateOrCreate([
-
-                'user_id' => $user->id,
-            ], [
-                'phone' => $request->phone,
-
-            ]);
-        }
-        else {
-            $profile_info = $user->profile()->updateOrCreate([
-
-                'user_id' => $user->id,
-            ], [
                 'description' => $request->description,
                 'country' => $request->country,
                 'image' => $request->image,
                 'phone' => $request->phone,
             ]);
         }
-
-        return response()->json($profile_info);
-    }
-
-
-    # to save  image
-    public function store_image_file($image)
-    {
-        $file = $image;
-        // dd($file);
-        $extension = $file->getClientOriginalExtension();
-        $temp_name  = uniqid(10) . time();
-        $image = interImage::make($file);
-        $path = 'uploads/profile/image_profile_' . $temp_name . '.' . $extension;
-        $image->save($path);
-
-        return $path;
+        return $this->responseSuccess('Profile Selected Successfully.');
     }
 }

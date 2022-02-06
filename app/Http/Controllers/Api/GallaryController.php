@@ -5,23 +5,24 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\imageTrait;
+use App\Http\Traits\responseApiTrait;
 use App\Models\Gallary;
 use Intervention\Image\Facades\Image as interImage;
 
 class GallaryController extends Controller
 {
-    use imageTrait;
+    use imageTrait, responseApiTrait;
 
     public function __construct()
     {
-
-        $this->middleware('JWT')->except(['index', 'show']);
+        $this->middleware(['JWT', 'Admin'])->except(['index', 'show']);
     }
 
     public function index()
     {
 
-        return Gallary::all();
+        $galleries = Gallary::all();
+        return $this->responseData('galleries', $galleries, 'Galleries Selected Successfully.');
     }
 
     public function store(Request $request)
@@ -38,14 +39,17 @@ class GallaryController extends Controller
             'name' => $request->name,
             'image' => $path,
         ]);
-        return response()->json([
-            'message' => 'Photo added successfully.',
-            'status' => 200
-        ]);
+        return $this->responseSuccess('Photo Added Successfully.');
     }
 
-    public function update(Request $request, Gallary $gallary)
+    public function update(Request $request, $gallary)
     {
+        $gallary = Gallary::find($gallary);
+
+        if (!$gallary) {
+            return $this->responseError(' Not Found page', 404);
+        }
+
         $request->validate([
             'name' => ['required'],
             'image' => ['required']
@@ -62,9 +66,7 @@ class GallaryController extends Controller
             'name' => $request->name,
             'image' => $path,
         ]);
-        return response()->json([
-            'message' => 'updatde has done successfully'
-        ]);
+        return $this->responseSuccess('Updatde has done Successfully');
     }
 
     public function change_status(Request $request, $gallary)
@@ -76,20 +78,30 @@ class GallaryController extends Controller
                 'status' => $request->status,
 
             ]);
-            return response()->json([
-                'message' => ' status updated has done successfully.'
-            ]);
+            return $this->responseSuccess('Status Updated has done Successfully.');
         }
     }
 
-    public function show(Gallary $gallary)
+    public function show($gallary)
     {
 
-        return response()->json($gallary);
+        $gallary = Gallary::find($gallary);
+
+        if (!$gallary) {
+            return $this->responseError(' Not Found page', 404);
+        }
+        if ($gallary) {
+            return $this->responseData('gallery', $gallary, 'Photo Selected Successfully.');
+        }
     }
 
-    public function destroy(Gallary $gallary)
+    public function destroy($gallary)
     {
+        $gallary = Gallary::find($gallary);
+
+        if (!$gallary) {
+            return $this->responseError(' Not Found page', 404);
+        }
 
         $image = $gallary->image;
         if ($image) {
@@ -97,10 +109,6 @@ class GallaryController extends Controller
         }
 
         $gallary->delete();
-
-        return response()->json([
-            'message' => 'photo deleted successfully.',
-            'status' => 200
-        ]);
+        return $this->responseSuccess('Photo Deleted Successfully');
     }
 }
