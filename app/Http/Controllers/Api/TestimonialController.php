@@ -7,6 +7,7 @@ use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\responseApiTrait;
+use App\Policies\TestimonialPolicy;
 
 class TestimonialController extends Controller
 {
@@ -14,15 +15,15 @@ class TestimonialController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['auth']);
+        $this->middleware(['auth','Admin','ChangeLocal']);
     }
 
     public function index()
     {
 
-        $data['testimonial'] = Testimonial::with('user:id,name,email')->latest()->paginate(5);
+        $data = Testimonial::with('user:id,name,email')->latest()->paginate(5);
 
-        return $this->responseData('testimonial', $data, 'Testemonials Selected Successfully.');
+        return $this->responseData('testimonial', $data);
     }
 
     public function store(Request $request)
@@ -38,7 +39,7 @@ class TestimonialController extends Controller
             ['description' => $request->description]
         );
 
-        return $this->responseSuccess('Testimonial Added Successfully.');
+        return $this->responseSuccess(__('Added successfully'));
     }
 
     public function update(Request $request, $testimonial)
@@ -47,7 +48,7 @@ class TestimonialController extends Controller
         $testimonial = Testimonial::find($testimonial);
 
         if (!$testimonial) {
-            return $this->responseError('Not Found page', 404);
+            return $this->responseError(__('Not Found Page'), 404);
         }
 
         $this->authorize('update', $testimonial);
@@ -59,7 +60,7 @@ class TestimonialController extends Controller
         $testimonial->update([
             'description' => $request->description
         ]);
-        return $this->responseSuccess('testimonial was updated successfully.');
+        return $this->responseSuccess(__('Updated Successfully'));
     }
 
     public function show($id)
@@ -71,12 +72,12 @@ class TestimonialController extends Controller
         $testimonial = Testimonial::find($testimonial);
 
         if (!$testimonial) {
-            return $this->responseError('Not Found page', 404);
+            return $this->responseError(__('Not Found Page'), 404);
         }
 
         $this->authorize('delete', $testimonial);
 
         $testimonial->delete();
-        return $this->responseSuccess('testimonial deleted successfully.');
+        return $this->responseSuccess(__('Deleted successfully'));
     }
 }

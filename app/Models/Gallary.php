@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Gallary extends Model
 {
@@ -11,12 +12,18 @@ class Gallary extends Model
 
     protected $fillable= ['name','image','status','id'];
 
-    protected $hidden=['created_at','updated_at'];
+    protected $hidden=['updated_at','image'];
 
-    protected $appends=['created_date'];
+    protected $appends = ['img'];
 
-    public function getCreatedDateAttribute(){
+    public function getCreatedAtAttribute($value)
+    {
+        $carbonDate = new Carbon($value);
+        return $carbonDate->diffForHumans();
+    }
 
-        return $this->created_at->diffForHumans();
+    public function getImgAttribute()
+    {
+        return asset('') . $this->image;
     }
 }

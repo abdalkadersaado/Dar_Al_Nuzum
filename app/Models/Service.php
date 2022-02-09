@@ -2,22 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Service extends Model
 {
     use HasFactory;
 
-    protected $fillable=['name','description','image'];
 
-    protected $hidden =['updated_at','created_at'];
+    protected $fillable = ['name_en', 'name_ar', 'description_en', 'description_ar', 'image'];
 
-    protected $appends = ['created_date'];
+    protected $hidden = ['updated_at', 'image'];
 
+    protected $appends = ['img'];
 
-    public function getCreatedDateAttribute()
+    ##### Accessories
+    public function getCreatedAtAttribute($value)
     {
-        return $this->created_at->diffForHumans();
+        $carbonDate = new Carbon($value);
+        return $carbonDate->diffForHumans();
     }
+
+    public function getImgAttribute()
+    {
+        return asset('') . $this->image;
+    }
+    #############
+
+    ############ Scope
+    public function scopeSelection($query)
+    {
+        return $query->select('id', 'name_' . app()->getLocale() . ' as name', 'description_' . app()->getLocale() . ' as description', 'created_at', 'image');
+    }
+
+    ###############
 }

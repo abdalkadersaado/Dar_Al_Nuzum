@@ -18,6 +18,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('JWT', ['except' => ['login', 'signup']]);
+        $this->middleware('ChangeLocal');
     }
 
     //
@@ -30,7 +31,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validateData = $request->validate([
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
 
         ]);
@@ -40,7 +41,6 @@ class AuthController extends Controller
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Email or Password Invalid'], 401);
         }
-
 
         return $this->respondWithToken($token);
     }
@@ -53,27 +53,16 @@ class AuthController extends Controller
     public function userProfile()
     {
 
-
-        // $profile = $user->Profile::with('user:id,name,email')->get();
-
         $user= auth()->user();
 
         $user_info = $user->load(['profile'=>function ($q){
             $q->select('description','country','image','phone','user_id');
-        } ]);
+        }]);
 
         return response()->json([
             'user_info'=>$user_info,
         ]);
     }
-
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-
-
 
     /**
      * Refresh a token.
@@ -126,6 +115,11 @@ class AuthController extends Controller
             'role_id' => auth()->user()->role_id,
         ]);
     }
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function logout()
     {

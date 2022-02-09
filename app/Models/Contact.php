@@ -28,5 +28,4 @@ class Contact extends Model
         return $carbonDate->diffForHumans();
     }
 
-
 }

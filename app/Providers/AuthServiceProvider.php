@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Contact;
 use App\Models\Service;
+use App\Policies\ContactPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\TestimonialPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -19,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         Service::class => ServicePolicy::class,
         Testimonial::class =>TestimonialPolicy::class,
+        Contact::class=>ContactPolicy::class,
     ];
 
     /**

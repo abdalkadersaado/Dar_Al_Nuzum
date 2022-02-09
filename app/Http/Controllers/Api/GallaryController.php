@@ -22,7 +22,7 @@ class GallaryController extends Controller
     {
 
         $galleries = Gallary::all();
-        return $this->responseData('galleries', $galleries, 'Galleries Selected Successfully.');
+        return $this->responseData('galleries', $galleries);
     }
 
     public function store(Request $request)
@@ -39,7 +39,7 @@ class GallaryController extends Controller
             'name' => $request->name,
             'image' => $path,
         ]);
-        return $this->responseSuccess('Photo Added Successfully.');
+        return $this->responseSuccess(__('Added Successfully'));
     }
 
     public function update(Request $request, $gallary)
@@ -47,7 +47,7 @@ class GallaryController extends Controller
         $gallary = Gallary::find($gallary);
 
         if (!$gallary) {
-            return $this->responseError(' Not Found page', 404);
+            return $this->responseError(__(' Not Found Page'), 404);
         }
 
         $request->validate([
@@ -66,7 +66,7 @@ class GallaryController extends Controller
             'name' => $request->name,
             'image' => $path,
         ]);
-        return $this->responseSuccess('Updatde has done Successfully');
+        return $this->responseSuccess(__('Updated Successfully'));
     }
 
     public function change_status(Request $request, $gallary)
@@ -78,7 +78,7 @@ class GallaryController extends Controller
                 'status' => $request->status,
 
             ]);
-            return $this->responseSuccess('Status Updated has done Successfully.');
+            return $this->responseSuccess(__('Status Updated Successfully'));
         }
     }
 
@@ -88,7 +88,7 @@ class GallaryController extends Controller
         $gallary = Gallary::find($gallary);
 
         if (!$gallary) {
-            return $this->responseError(' Not Found page', 404);
+            return $this->responseError(__(' Not Found Page'), 404);
         }
         if ($gallary) {
             return $this->responseData('gallery', $gallary, 'Photo Selected Successfully.');
@@ -100,7 +100,7 @@ class GallaryController extends Controller
         $gallary = Gallary::find($gallary);
 
         if (!$gallary) {
-            return $this->responseError(' Not Found page', 404);
+            return $this->responseError(__(' Not Found Page'), 404);
         }
 
         $image = $gallary->image;
@@ -109,6 +109,6 @@ class GallaryController extends Controller
         }
 
         $gallary->delete();
-        return $this->responseSuccess('Photo Deleted Successfully');
+        return $this->responseSuccess(__('Deleted Successfully'));
     }
 }

@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Api\AuthController;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -94,10 +96,34 @@ Route::group(['namespace' => 'Api', 'middleware' => 'api'], function () {
     Route::post('Teams/{team}', 'TeamController@update');
 });
 ########################################################################
+$locale = request()->segment(2);
+Route::group(['prefix' => LaravelLocalization::setlocale($locale)], function()
+{
 
 ############################ Contact ####################################
 Route::group(['namespace' => 'Api', 'middleware' => 'api'], function () {
     Route::apiResource('contacts', 'ContactController');
     Route::put('contacts/seen/{id}', 'ContactController@seen_message');
 });
+
+Route::get('allLanguages',function(){
+    $langs= LaravelLocalization::getLocalesOrder();
+    $current_lang = LaravelLocalization::getCurrentLocale();
+    $locale = request()->segment(2);
+    $set_locale = LaravelLocalization::setlocale($locale);
+    return response()->json([
+        'languages' =>array_keys($langs),
+        'Current' => $current_lang,
+        'set_locale'=>$set_locale
+    ]);
+});
 ########################################################################
+
+Route::fallback(function(){
+    return response()->json([
+        'message'=> __('Not Found Page'),
+        'status'=>404
+    ],404);
+})->name('api.fallback');
+
+});

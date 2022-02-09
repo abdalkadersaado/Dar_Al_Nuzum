@@ -10,5 +10,12 @@ class Team extends Model
     use HasFactory;
 
     protected $fillable=['name','image','profession'];
+    public $timestamps = false;
+    protected $hidden=['image','created_at','updated_at'];
+    protected $appends=['img'];
 
+    public function getImgAttribute()
+    {
+        return asset('') . $this->image;
+    }
 }

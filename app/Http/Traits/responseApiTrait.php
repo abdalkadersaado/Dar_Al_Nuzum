@@ -31,7 +31,7 @@ trait responseApiTrait{
     {
         return response()->json([
             'status' => 200,
-            'msg' => $msg,
+            'msg' => __('Data Selected Successfully'),
             $key => $value
         ]);
     }

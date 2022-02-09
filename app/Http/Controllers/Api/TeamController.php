@@ -14,7 +14,7 @@ class TeamController extends Controller
 
     public function __construct()
     {
-        $this->middleware('Admin');
+        $this->middleware('Admin')->except('index','show');
     }
 
     public function index()
@@ -71,7 +71,7 @@ class TeamController extends Controller
             'profession' => $request->profession
         ]);
 
-        return $this->responseSuccess('Updated Successfully.');
+        return $this->responseSuccess(__('Updated Successfully'));
     }
     public function show($team)
     {
@@ -80,7 +80,7 @@ class TeamController extends Controller
             return response()->json($team);
         }
         if (!$team) {
-            return $this->responseError('Not Found Page.', 404);
+            return $this->responseError(__('Not Found Page'), 404);
         }
     }
 
@@ -89,10 +89,15 @@ class TeamController extends Controller
     {
         $team = Team::find($Team);
         if (!$team) {
-            return $this->responseError('Not Found Page.', 404);
+            return $this->responseError(__('Not Found Page'), 404);
+        }
+        $image = $team->image;
+
+        if ($image) {
+            unlink($image);
         }
 
         $team->delete();
-        return $this->responseSuccess('Deleted Successfully.');
+        return $this->responseSuccess(__('Deleted Successfully'));
     }
 }

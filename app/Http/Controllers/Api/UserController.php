@@ -20,7 +20,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $user = User::get();
+        $user = User::where('role_id','=',2)->get();
         return $this->responseData('users', $user, 'Users Selected Successfully.');
     }
 
@@ -29,7 +29,7 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required',
-            'email' => ['required', 'email', 'unique:users'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'min:6'],
         ]);
 

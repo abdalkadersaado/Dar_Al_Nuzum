@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Testimonial;
+use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class TestimonialPolicy
+class ContactPolicy
 {
     use HandlesAuthorization;
 
@@ -25,12 +25,12 @@ class TestimonialPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Testimonial  $testimonial
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Testimonial $testimonial)
+    public function view(User $user, Contact $contact)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -48,34 +48,34 @@ class TestimonialPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Testimonial  $testimonial
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Testimonial $testimonial)
+    public function update(User $user, Contact $contact)
     {
-         return $user->id == $testimonial->user_id || $user->role_id == 1;
+       return  $user->role_id === 1;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Testimonial  $testimonial
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Testimonial $testimonial)
+    public function delete(User $user, Contact $contact)
     {
-        return $user->id == $testimonial->user_id || $user->role_id == 1;
+        return $user->role_id === 1;
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Testimonial  $testimonial
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Testimonial $testimonial)
+    public function restore(User $user, Contact $contact)
     {
         //
     }
@@ -84,10 +84,10 @@ class TestimonialPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Testimonial  $testimonial
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Testimonial $testimonial)
+    public function forceDelete(User $user, Contact $contact)
     {
         //
     }

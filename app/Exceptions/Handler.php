@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Exception;
 use Throwable;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Auth\Access\AuthorizationException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
@@ -37,5 +42,24 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e)
+    {
+
+        if ($request->expectsJson() && $e instanceof ModelNotFoundException) {
+
+            return Route::respondWithRoute('api.fallback');
+        }
+
+        if ($request->expectsJson() && $e instanceof AuthorizationException) {
+            return response()->json(['message' => $e->getMessage()], 403);
+        }
+
+        if ($request->expectsJson() && $e instanceof TokenInvalidException) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+        return parent::render($request, $e);
     }
 }

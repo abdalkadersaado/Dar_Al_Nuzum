@@ -14,13 +14,14 @@ class BlogController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['JWT', 'Admin'])->except('index', 'show');
+        $this->middleware(['JWT', 'Admin','ChangeLocal'])->except('index', 'show');
+        $this->middleware('ChangeLocal');
     }
 
     public function index()
     {
 
-        $blogs = Blog::latest()->paginate(10);
+        $blogs = Blog::Selection()->latest()->paginate(10);
 
         return $this->responseData('blogs', $blogs, 'Blogs Selected Successfully');
     }
@@ -28,15 +29,19 @@ class BlogController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => ['required'],
-            'description' => ['required'],
+            'title_en' => ['required'],
+            'title_ar' => ['required'],
+            'description_en' => ['required'],
+            'description_ar' => ['required'],
             'image' => ['required']
         ]);
 
         $path =  $this->store_image_file2($request->image, 'attachments/blog');
         $request->user()->blogs()->create([
-            'title' => $request->title,
-            'description' => $request->description,
+            'title_en' => $request->title_en,
+            'title_ar' => $request->title_ar,
+            'description_en' => $request->description_en,
+            'description_ar' => $request->description_ar,
             'image' => $path,
         ]);
         return $this->responseSuccess('Added successfully');
@@ -51,8 +56,10 @@ class BlogController extends Controller
         }
 
         $request->validate([
-            'title' => ['required'],
-            'description' => ['required'],
+            'title_en' => ['required'],
+            'title_ar' => ['required'],
+            'description_en' => ['required'],
+            'description_ar' => ['required'],
             'image' => ['required']
         ]);
         //update image from directory
@@ -64,8 +71,10 @@ class BlogController extends Controller
         $path =  $this->store_image_file2($request->image, 'attachments/blog');
 
         $blog->update([
-            'title' => $request->title,
-            'description' => $request->description,
+            'title_en' => $request->title_en,
+            'title_ar' => $request->title_ar,
+            'description_en' => $request->description_en,
+            'description_ar' => $request->description_ar,
             'image' => $path,
         ]);
         return $this->responseSuccess('Updated successfully');
@@ -74,7 +83,7 @@ class BlogController extends Controller
 
     public function show($id)
     {
-        $blog = Blog::find($id);
+        $blog = Blog::Selection()->find($id);
 
         if (!$blog) {
             return $this->responseError('Not Found Page', 404);

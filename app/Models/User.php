@@ -34,7 +34,8 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
         'created_at',
         'updated_at',
-        'email_verified_at'
+        'email_verified_at',
+        'role_id'
     ];
 
     /**
@@ -46,7 +47,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $with=['profile'];
+     protected $with=['profile'];
 
     ############# Relationship #####################
 
