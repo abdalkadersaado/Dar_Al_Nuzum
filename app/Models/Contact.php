@@ -10,22 +10,11 @@ class Contact extends Model
 {
     use HasFactory;
 
-    protected $fillable=['name','email','message','status'];
+    protected $fillable=['name','email','message','status','created_date'];
 
     public function getNameAttribute($value)
     {
        return ucwords($value);
-    }
-
-    public function getCreatedAtAttribute($value)
-    {
-        $carbonDate = new Carbon($value);
-        return $carbonDate->diffForHumans();
-    }
-    public function getUpdatedAtAttribute($value)
-    {
-        $carbonDate = new Carbon($value);
-        return $carbonDate->diffForHumans();
     }
 
 }

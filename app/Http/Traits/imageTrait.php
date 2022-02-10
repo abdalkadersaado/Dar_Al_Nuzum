@@ -26,12 +26,9 @@ trait imageTrait {
         $file = $image;
         // dd($file);
         $extension = $file->getClientOriginalExtension();
-        $temp_name  = uniqid(10) . time();
+        $temp_name  = uniqid(3) . time();
         $image = interImage::make($file);
-        // $path = $file->storeAs('attachments/gallary/', $file->getClientOriginalName(), 'upload_attachments');
-        $path = $file->storeAs($pathImage, $file->getClientOriginalName(), 'upload_attachments');
-
-        // $path = 'image/gallary/image_gallary_' . $temp_name . '.' . $extension;
+        $path = $file->storeAs($pathImage, $temp_name.$file->getClientOriginalName(), 'upload_attachments');
         $image->save($path);
 
         return $path;

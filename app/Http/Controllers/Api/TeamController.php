@@ -20,7 +20,7 @@ class TeamController extends Controller
     public function index()
     {
         $teams = Team::get();
-        return $this->responseData('teams', $teams, 'Teams selected Successfully.');
+        return $this->responseData('teams', $teams);
     }
 
     public function store(Request $request)
@@ -40,16 +40,21 @@ class TeamController extends Controller
             'image' => $path,
             'profession' => $request->profession
         ]);
-        return $this->responseSuccess('Added Successfully.');
+        return $this->responseSuccess(__('Added Successfully'));
     }
 
     public function update(Request $request, $team)
     {
+        $request->validate([
+            'name' => ['required'],
+            'image' => 'required|image',
+            'profession' => 'required',
+        ]);
 
         $team = Team::find($team);
 
         if (!$team) {
-            return $this->responseError('Not Found Page.', 404);
+            return $this->responseError(__('Not Found Page'), 404);
         }
 
         $request->validate([

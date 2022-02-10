@@ -15,12 +15,12 @@ class ContactController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['auth', 'Admin'])->except(['store']);
+        $this->middleware(['Admin'])->except(['store']);
     }
     public function index()
     {
 
-        $contact =  Contact::get();
+        $contact =  Contact::latest()->paginate(2);
         $count_messages_unseed = Contact::where('status', 0)->count();
         return response()->json([
             'message' => __('Data selected Successfully'),
@@ -35,10 +35,15 @@ class ContactController extends Controller
 
     public function store(StoreContact $request)
     {
+        date_default_timezone_set("Asia/Dubai");
+        $contact_time = date("h:i:sa");
+        $contact_date = date("d-m-Y");
+
         $contact = Contact::create([
             'name' => $request->name,
             'email' => $request->email,
-            'message' => $request->message
+            'message' => $request->message,
+            'created_date'=>$contact_date ." " . $contact_time,
         ]);
         return $this->responseSuccess(__('Added successfully'));
     }
@@ -104,5 +109,23 @@ class ContactController extends Controller
 
             return $this->responseSuccess(__('Deleted Successfully'));
         }
+    }
+
+    public function contactBySearch(Request $request){
+
+        $key = $request->key;
+        $contactlist= Contact::where('name','LIKE',"%{$key}%")
+                            ->orWhere('email','LIKE',"%{$key}%")
+                           ->orWhere('message','LIKE',"%{$key}%")
+                            ->get();
+
+        if(count($contactlist) == 0){
+            return $this->responseError('Not Found Any search');
+        }
+
+        if($contactlist){
+            return $this->responseData('users',$contactlist);
+        }
+
     }
 }

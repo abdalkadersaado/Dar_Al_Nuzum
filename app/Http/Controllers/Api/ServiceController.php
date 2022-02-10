@@ -23,7 +23,7 @@ class ServiceController extends Controller
     {
         // $this->authorize('viewAny', Service::class);
 
-        $services = Service::Selection()->get();
+        $services = Service::Selection()->latest()->paginate(10);
         if (count($services) > 0) {
             return  $this->responseData('service', $services);
         } else {
@@ -115,5 +115,22 @@ class ServiceController extends Controller
 
         $service->delete();
         return $this->responseSuccess(__('Deleted Successfully'));
+    }
+
+    public function serviceBySearch(Request $request){
+
+        $key = $request->key;
+        $searchlist = Service::where('name_en','LIKE',"%{$key}%")
+                        ->orWhere('name_ar','LIKE',"%{$key}%")
+                        ->Selection()->get();
+
+        if(count($searchlist) == 0){
+            return $this->responseError('Not Found Any search');
+        }
+
+        if($searchlist){
+            return $this->responseData('users',$searchlist);
+        }
+
     }
 }

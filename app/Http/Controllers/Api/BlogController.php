@@ -14,7 +14,7 @@ class BlogController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['JWT', 'Admin','ChangeLocal'])->except('index', 'show');
+        $this->middleware(['JWT', 'Admin','ChangeLocal'])->except('index', 'show','blogBySearch');
         $this->middleware('ChangeLocal');
     }
 
@@ -109,5 +109,22 @@ class BlogController extends Controller
 
         $blog->delete();
         return $this->responseSuccess('blog was Deleted successfully.');
+    }
+
+    public function blogBySearch(Request $request){
+
+        $key = $request->key;
+        $bloglist = Blog::where('title_ar','LIKE',"%{$key}%")
+                        ->orWhere('title_en','LIKE',"%{$key}%")
+                        ->Selection()->get();
+
+        if(count($bloglist) == 0){
+            return $this->responseError('Not Found Any search');
+        }
+
+        if($bloglist){
+            return $this->responseData('users',$bloglist);
+        }
+
     }
 }

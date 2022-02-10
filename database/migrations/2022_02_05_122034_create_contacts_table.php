@@ -19,7 +19,7 @@ class CreateContactsTable extends Migration
             $table->string('email');
             $table->text('message');
             $table->tinyInteger('status')->default(0);
-            $table->timestamps();
+            $table->string('created_date');
         });
     }
 

@@ -20,15 +20,15 @@ class UserController extends Controller
 
     public function index()
     {
-        $user = User::where('role_id','=',2)->get();
-        return $this->responseData('users', $user, 'Users Selected Successfully.');
+        $user = User::where('role_id','=',2)->latest()->paginate(10);
+        return $this->responseData('users', $user);
     }
 
     public function store(Request $request)
     {
 
         $request->validate([
-            'name' => 'required',
+            'name' => ['required','unique:users,name'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'min:6'],
         ]);
@@ -81,5 +81,19 @@ class UserController extends Controller
             $user->delete();
             return $this->responseSuccess('User Deleted Successfully.');
         }
+    }
+
+    public function userBySearch(Request $request){
+
+        $key = $request->key;
+        $userlist = User::where('name','LIKE',"%{$key}%")->orWhere('email','LIKE',"%{$key}%")->get();
+        if(count($userlist) == 0){
+            return $this->responseError('Not Found Any search');
+        }
+
+        if($userlist){
+            return $this->responseData('users',$userlist);
+        }
+
     }
 }

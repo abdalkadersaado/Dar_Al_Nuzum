@@ -7,7 +7,6 @@ use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\responseApiTrait;
-use App\Policies\TestimonialPolicy;
 
 class TestimonialController extends Controller
 {
@@ -21,7 +20,7 @@ class TestimonialController extends Controller
     public function index()
     {
 
-        $data = Testimonial::with('user:id,name,email')->latest()->paginate(5);
+        $data = Testimonial::with('user:id,name,email')->latest()->paginate(10);
 
         return $this->responseData('testimonial', $data);
     }
